@@ -1,89 +1,47 @@
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import Animated, { Keyframe } from 'react-native-reanimated';
+import Animated, {
+  FadeIn,
+  FadeOut,
+  LinearTransition,
+} from 'react-native-reanimated';
 
-const Perspective = 200;
-
-const InitialKeyframe = {
-  opacity: 0,
-  transform: [
-    {
-      perspective: Perspective,
-    },
-    {
-      translateY: 75,
-    },
-    {
-      rotateX: '-25deg',
-    },
-  ],
-};
-
-const EndKeyframe = {
-  opacity: 1,
-  transform: [
-    {
-      perspective: Perspective,
-    },
-    {
-      translateY: 0,
-    },
-    {
-      rotateX: '0deg',
-    },
-  ],
-};
-
-const CustomFlipIn = new Keyframe({
-  from: InitialKeyframe,
-  to: EndKeyframe,
-}).duration(250);
-
-const CustomFlipOut = new Keyframe({
-  from: EndKeyframe,
-  to: {
-    ...InitialKeyframe,
-    transform: [
-      {
-        perspective: Perspective,
-      },
-      {
-        translateY: -75,
-      },
-      {
-        rotateX: '25deg',
-      },
-    ],
-  },
-}).duration(250);
+import { generateRandomColor } from './utils';
 
 const App = () => {
-  const [isVisible, setIsVisible] = useState(true);
+  const [ids, setIds] = useState<string[]>([]);
 
   return (
-    <TouchableOpacity
+    <View
       style={styles.container}
-      activeOpacity={1}
-      onPress={() => {
-        console.log('Pressed');
-        setIsVisible(prev => !prev);
+      onTouchEnd={() => {
+        setIds(() => [generateRandomColor(), ...ids]);
       }}>
       <StatusBar style="auto" />
-      {isVisible && (
-        <Animated.View
-          entering={CustomFlipIn}
-          exiting={CustomFlipOut}
-          style={{
-            height: 120,
-            aspectRatio: 1,
-            backgroundColor: '#0086e6',
-            borderRadius: 20,
-            borderCurve: 'continuous',
-          }}
-        />
-      )}
-    </TouchableOpacity>
+      <ScrollView
+        contentContainerStyle={{ paddingTop: 70 }}
+        style={{ flex: 1 }}>
+        {ids.map((colorId, _) => {
+          return (
+            <Animated.View
+              layout={LinearTransition.springify()}
+              entering={FadeIn.duration(250)}
+              exiting={FadeOut.duration(250)}
+              key={colorId}
+              style={{
+                height: 90,
+                width: '95%',
+                backgroundColor: colorId,
+                borderRadius: 20,
+                alignSelf: 'center',
+                marginBottom: 10,
+              }}
+            />
+          );
+        })}
+      </ScrollView>
+    </View>
   );
 };
 
@@ -91,8 +49,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
 
