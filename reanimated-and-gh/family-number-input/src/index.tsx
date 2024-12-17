@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { ButtonsGrid } from './components/buttons-grid';
 import { AnimatedNumber } from './components/animated-number';
@@ -20,6 +21,17 @@ const App = () => {
           alignItems: 'center',
         }}>
         <AnimatedNumber number={number} />
+        <LinearGradient
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '55%',
+          }}
+          locations={[0, 0.7]}
+          colors={['rgba(0,0,0,0)', '#000']}
+        />
       </View>
       <View style={{ flex: 1, marginBottom: safeBottom }}>
         <ButtonsGrid

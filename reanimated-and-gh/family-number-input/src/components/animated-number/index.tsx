@@ -39,6 +39,7 @@ export const AnimatedNumber: React.FC<AnimatedNumberProps> = ({ number }) => {
             fontSize: 90,
             color: '#fff',
             fontFamily: 'SF-Pro-Rounded-Bold',
+            marginHorizontal: 2,
           }}>
           {num}
         </Animated.Text>
