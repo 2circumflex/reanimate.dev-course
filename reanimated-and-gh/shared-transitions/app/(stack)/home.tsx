@@ -5,12 +5,12 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { Image } from 'expo-image';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from 'expo-router';
 
 import { data, Palette } from '../../src/constants';
+import { AnimatedImage } from '../../src/components/animated-image';
 
 export default function Page() {
   const { width: windowWidth } = useWindowDimensions();
@@ -31,12 +31,13 @@ export default function Page() {
         contentContainerStyle={{
           paddingTop: headerHeight,
         }}
-        renderItem={({ item }) => {
+        renderItem={({ item, index }) => {
+          const tag = index.toString();
           return (
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate('detail', {
-                  tag: '',
+                  tag,
                   imageUri: item.url,
                 });
               }}
@@ -44,14 +45,15 @@ export default function Page() {
                 marginLeft: gap,
                 marginRight: gap,
               }}>
-              <Image
+              <AnimatedImage
                 source={{ uri: item.url }}
+                sharedTransitionTag={tag}
                 style={{
-                  width: itemSize,
                   height: itemSize,
+                  width: itemSize,
                 }}
                 contentFit="cover"
-                cachePolicy="memory-disk"
+                cachePolicy={'memory-disk'}
               />
             </TouchableOpacity>
           );

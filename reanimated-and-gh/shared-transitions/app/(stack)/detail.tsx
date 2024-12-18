@@ -1,7 +1,8 @@
 import { BlurView } from 'expo-blur';
-import { Image } from 'expo-image';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
+
+import { AnimatedImage } from '../../src/components/animated-image';
 
 const Detail = () => {
   const { imageUri, tag } = useLocalSearchParams<{
@@ -29,16 +30,21 @@ const Detail = () => {
           backgroundColor: 'rgba(0, 0, 0, 0.7)',
         }}
       />
-      <Image
+      <AnimatedImage
         source={{
           uri: imageUri,
         }}
+        sharedTransitionTag={tag}
         style={{
           width: '70%',
           aspectRatio: 1,
           borderRadius: 25,
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           borderCurve: 'continuous',
         }}
+        contentFit="cover"
+        cachePolicy={'memory-disk'}
       />
     </View>
   );
