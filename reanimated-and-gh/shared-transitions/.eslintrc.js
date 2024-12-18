@@ -9,6 +9,8 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     'import/no-useless-path-segments': 'off',
     'no-unused-vars': 'off',
+    'import/no-default-export': 'off',
+    'import/no-extraneous-dependencies': 'off',
   },
   env: {
     // ... other environments
