@@ -1,7 +1,14 @@
-import { FlatList, StyleSheet, useWindowDimensions, View } from 'react-native';
+import {
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { Image } from 'expo-image';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { StatusBar } from 'expo-status-bar';
+import { useNavigation } from 'expo-router';
 
 import { data, Palette } from '../../src/constants';
 
@@ -12,6 +19,8 @@ export default function Page() {
   const itemSize = (windowWidth - spacing) / 3;
 
   const headerHeight = useHeaderHeight();
+
+  const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
@@ -24,7 +33,13 @@ export default function Page() {
         }}
         renderItem={({ item }) => {
           return (
-            <View
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('detail', {
+                  tag: '',
+                  imageUri: item.url,
+                });
+              }}
               style={{
                 marginLeft: gap,
                 marginRight: gap,
@@ -35,8 +50,10 @@ export default function Page() {
                   width: itemSize,
                   height: itemSize,
                 }}
+                contentFit="cover"
+                cachePolicy="memory-disk"
               />
-            </View>
+            </TouchableOpacity>
           );
         }}
       />

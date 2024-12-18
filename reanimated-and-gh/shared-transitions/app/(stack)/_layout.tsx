@@ -4,7 +4,11 @@ import { Palette } from '../../src/constants';
 
 const Layout = () => {
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        presentation: 'containedTransparentModal',
+        animation: 'fade',
+      }}>
       <Stack.Screen
         name="home"
         options={{
@@ -14,6 +18,12 @@ const Layout = () => {
           headerTitleStyle: {
             color: Palette.text,
           },
+        }}
+      />
+      <Stack.Screen
+        name="detail"
+        options={{
+          headerShown: false,
         }}
       />
     </Stack>
