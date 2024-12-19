@@ -7,7 +7,7 @@ const App = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
-      <MagicButton width={100} height={100} />
+      <MagicButton width={200} height={70} />
     </View>
   );
 };

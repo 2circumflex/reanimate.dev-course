@@ -1,12 +1,20 @@
 import {
   BlurMask,
   Canvas,
+  Group,
   RoundedRect,
   SweepGradient,
+  vec,
 } from '@shopify/react-native-skia';
 import React from 'react';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
-import Animated, { useSharedValue } from 'react-native-reanimated';
+import Animated, {
+  useAnimatedStyle,
+  useDerivedValue,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 
 type MagicButtonProps = {
   onPress?: () => void;
@@ -40,28 +48,66 @@ export const MagicButton: React.FC<MagicButtonProps> = ({
       console.log('Finalized');
     });
 
+  const scale = useDerivedValue(() => {
+    return withSpring(isTouched.value ? 1.2 : 1);
+  });
+
+  const rStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          scale: scale.value,
+        },
+      ],
+    };
+  }, []);
+
+  const rotate = useDerivedValue(() => {
+    return withTiming(isTouched.value ? Math.PI * 2 : 0, {
+      duration: 1000,
+    });
+  }, []);
+
+  const blur = useDerivedValue(() => {
+    return withTiming(isTouched.value ? 40 : 0, {
+      duration: 1000,
+    });
+  }, []);
+
+  const transform = useDerivedValue(() => {
+    return [
+      {
+        rotate: rotate.value,
+      },
+    ];
+  }, []);
+
   return (
     <GestureDetector gesture={tapGesture}>
-      <Animated.View>
+      <Animated.View style={rStyle}>
         <Canvas
           style={{
             height: realHeight,
             width: realWidth,
             backgroundColor: '#000',
           }}>
-          <RoundedRect
-            x={realX}
-            y={realY}
-            width={width}
-            height={height}
-            color={'red'}
-            r={width / 2}>
-            <SweepGradient
-              c={center}
-              colors={['cyan', 'magenta', 'yellow', 'cyan']}
-            />
-            <BlurMask blur={40} style={'solid'} />
-          </RoundedRect>
+          <Group
+            origin={vec(realX + width / 2, realY + height / 2)}
+            transform={transform}>
+            <RoundedRect
+              x={realX}
+              y={realY}
+              width={width}
+              height={height}
+              color={'red'}
+              r={width / 2}>
+              <SweepGradient
+                c={center}
+                colors={['cyan', 'magenta', 'yellow', 'cyan']}
+              />
+              <BlurMask blur={blur} style={'solid'} />
+            </RoundedRect>
+          </Group>
           <RoundedRect
             x={internalPadding / 2 + realX}
             y={internalPadding / 2 + realY}
