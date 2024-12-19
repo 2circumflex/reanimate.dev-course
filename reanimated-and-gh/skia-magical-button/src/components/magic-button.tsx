@@ -1,4 +1,5 @@
 import {
+  BlurMask,
   Canvas,
   Circle,
   Rect,
@@ -18,18 +19,25 @@ export const MagicButton: React.FC<MagicButtonProps> = ({
   width,
   height,
 }: MagicButtonProps) => {
-  const center = { x: width / 2, y: height / 2 };
   const internalPadding = 10;
+
+  const externalPadding = 200;
+  const realWidth = width + externalPadding;
+  const realHeight = height + externalPadding;
+  const realX = externalPadding / 2;
+  const realY = externalPadding / 2;
+  const center = { x: width / 2 + realX, y: height / 2 + realY };
 
   return (
     <Canvas
       style={{
-        height: height,
-        width: width,
+        height: realHeight,
+        width: realWidth,
+        backgroundColor: '#000',
       }}>
       <RoundedRect
-        x={0}
-        y={0}
+        x={realX}
+        y={realY}
         width={width}
         height={height}
         color={'red'}
@@ -38,10 +46,11 @@ export const MagicButton: React.FC<MagicButtonProps> = ({
           c={center}
           colors={['cyan', 'magenta', 'yellow', 'cyan']}
         />
+        <BlurMask blur={40} style={'solid'} />
       </RoundedRect>
       <RoundedRect
-        x={internalPadding / 2}
-        y={internalPadding / 2}
+        x={internalPadding / 2 + realX}
+        y={internalPadding / 2 + realY}
         width={width - internalPadding}
         height={height - internalPadding}
         color={'black'}
