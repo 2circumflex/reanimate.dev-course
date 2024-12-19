@@ -16,6 +16,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import Touchable, { useGestureHandler } from 'react-native-skia-gesture';
 
 type MagicButtonProps = {
   onPress?: () => void;
@@ -38,22 +39,6 @@ export const MagicButton: React.FC<MagicButtonProps> = ({
   const center = { x: width / 2 + realX, y: height / 2 + realY };
 
   const isTouched = useSharedValue(false);
-
-  const tapGesture = Gesture.Tap()
-    .maxDuration(10000)
-    .onBegin(() => {
-      isTouched.value = true;
-      console.log('Touched');
-    })
-    .onTouchesUp(() => {
-      if (onPress) {
-        runOnJS(onPress)();
-      }
-    })
-    .onFinalize(() => {
-      isTouched.value = false;
-      console.log('Finalized');
-    });
 
   const scale = useDerivedValue(() => {
     return withSpring(isTouched.value ? 1.2 : 1);
@@ -89,42 +74,53 @@ export const MagicButton: React.FC<MagicButtonProps> = ({
     ];
   }, []);
 
+  const tapGesture = useGestureHandler({
+    onStart: () => {
+      'worklet';
+      isTouched.value = true;
+    },
+    onEnd: () => {
+      'worklet';
+      isTouched.value = false;
+      if (onPress) runOnJS(onPress)();
+    },
+  });
+
   return (
-    <GestureDetector gesture={tapGesture}>
-      <Animated.View style={rStyle}>
-        <Canvas
-          style={{
-            height: realHeight,
-            width: realWidth,
-            backgroundColor: '#000',
-          }}>
-          <Group
-            origin={vec(realX + width / 2, realY + height / 2)}
-            transform={transform}>
-            <RoundedRect
-              x={realX}
-              y={realY}
-              width={width}
-              height={height}
-              color={'red'}
-              r={width / 2}>
-              <SweepGradient
-                c={center}
-                colors={['cyan', 'magenta', 'yellow', 'cyan']}
-              />
-              <BlurMask blur={blur} style={'solid'} />
-            </RoundedRect>
-          </Group>
+    <Animated.View style={rStyle}>
+      <Touchable.Canvas
+        style={{
+          height: realHeight,
+          width: realWidth,
+          backgroundColor: '#000',
+        }}>
+        <Group
+          origin={vec(realX + width / 2, realY + height / 2)}
+          transform={transform}>
           <RoundedRect
-            x={internalPadding / 2 + realX}
-            y={internalPadding / 2 + realY}
-            width={width - internalPadding}
-            height={height - internalPadding}
-            color={'black'}
-            r={width / 2}
-          />
-        </Canvas>
-      </Animated.View>
-    </GestureDetector>
+            x={realX}
+            y={realY}
+            width={width}
+            height={height}
+            color={'red'}
+            r={width / 2}>
+            <SweepGradient
+              c={center}
+              colors={['cyan', 'magenta', 'yellow', 'cyan']}
+            />
+            <BlurMask blur={blur} style={'solid'} />
+          </RoundedRect>
+        </Group>
+        <Touchable.RoundedRect
+          x={internalPadding / 2 + realX}
+          y={internalPadding / 2 + realY}
+          width={width - internalPadding}
+          height={height - internalPadding}
+          color={'black'}
+          r={width / 2}
+          {...tapGesture}
+        />
+      </Touchable.Canvas>
+    </Animated.View>
   );
 };
