@@ -7,7 +7,14 @@ const App = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
-      <MagicButton width={200} height={70} />
+      <MagicButton
+        width={200}
+        height={70}
+        onPress={() => {
+          //
+          console.log('pressed');
+        }}
+      />
     </View>
   );
 };

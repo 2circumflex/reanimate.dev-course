@@ -9,6 +9,7 @@ import {
 import React from 'react';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, {
+  runOnJS,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
@@ -25,6 +26,7 @@ type MagicButtonProps = {
 export const MagicButton: React.FC<MagicButtonProps> = ({
   width,
   height,
+  onPress,
 }: MagicButtonProps) => {
   const internalPadding = 10;
 
@@ -42,6 +44,11 @@ export const MagicButton: React.FC<MagicButtonProps> = ({
     .onBegin(() => {
       isTouched.value = true;
       console.log('Touched');
+    })
+    .onTouchesUp(() => {
+      if (onPress) {
+        runOnJS(onPress)();
+      }
     })
     .onFinalize(() => {
       isTouched.value = false;
