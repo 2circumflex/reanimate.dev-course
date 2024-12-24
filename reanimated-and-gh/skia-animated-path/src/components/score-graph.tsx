@@ -1,5 +1,11 @@
 import { useWindowDimensions } from 'react-native';
-import { Canvas, Group, Path, Skia } from '@shopify/react-native-skia';
+import {
+  Canvas,
+  CornerPathEffect,
+  Group,
+  Path,
+  Skia,
+} from '@shopify/react-native-skia';
 import { useMemo } from 'react';
 
 import { AMOUNT_POINTS, LIGHT_GRAPH_SCORES, Palette } from '../constants';
@@ -49,7 +55,9 @@ export const ScoreGraph: React.FC<ScoreGraphProps> = ({
           color={'#c100cfff'}
           style={'stroke'}
           strokeWidth={4}
-        />
+          strokeCap={'round'}>
+          <CornerPathEffect r={20} />
+        </Path>
       </Group>
     </Canvas>
   );
