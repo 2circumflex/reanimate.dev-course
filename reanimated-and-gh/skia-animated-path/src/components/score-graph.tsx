@@ -1,10 +1,13 @@
 import {
   Canvas,
   CornerPathEffect,
+  DashPathEffect,
   Group,
+  Line,
   Path,
   Skia,
   usePathInterpolation,
+  vec,
 } from '@shopify/react-native-skia';
 import { useDerivedValue, withTiming } from 'react-native-reanimated';
 
@@ -21,12 +24,16 @@ type ScoreGraphProps = {
   height: number;
 };
 
+const getNormalizedY = (value: number, height: number) => {
+  return height - (value / 100) * height;
+};
+
 const getPathFromScores = (scores: number[], width: number, height: number) => {
   const skPath = Skia.Path.Make();
   for (let i = 0; i < scores.length; i++) {
     skPath.lineTo(
       (i * width) / AMOUNT_POINTS,
-      height - (scores[i] / 100) * height,
+      getNormalizedY(scores[i], height),
     );
   }
   return skPath;
@@ -41,21 +48,6 @@ export const ScoreGraph: React.FC<ScoreGraphProps> = ({
   const internalHorizontalPadding = 20;
   const fixedHeight = height - internalVerticalPadding * 2;
   const fixedWidth = width - internalHorizontalPadding * 2;
-
-  // const graphScores = useMemo(() => {
-  //   switch (option) {
-  //     case 'Light':
-  //       return LIGHT_GRAPH_SCORES;
-  //     case 'Standard':
-  //       return STANDARD_GRAPH_SCORES;
-  //     case 'Pro':
-  //       return PRO_GRAPH_SCORES;
-  //   }
-  // }, [option]);
-
-  // const path = useMemo(() => {
-  //   return getPathFromScores(graphScores, fixedWidth, fixedHeight);
-  // }, [graphScores]);
 
   const progress = useDerivedValue(() => {
     switch (option) {
@@ -88,10 +80,21 @@ export const ScoreGraph: React.FC<ScoreGraphProps> = ({
         width,
         height,
       }}>
+      <Group transform={[{ translateY: internalVerticalPadding }]}>
+        <Line
+          p1={vec(0, getNormalizedY(70, fixedHeight))}
+          p2={vec(width, getNormalizedY(70, fixedHeight))}
+          strokeWidth={2}
+          color={'#cac8c2'}>
+          <DashPathEffect intervals={[4, 4]} />
+        </Line>
+      </Group>
       <Group
         transform={[
           { translateY: internalVerticalPadding },
-          { translateX: internalHorizontalPadding },
+          {
+            translateX: internalHorizontalPadding,
+          },
         ]}>
         <Path
           path={animatedPath}
