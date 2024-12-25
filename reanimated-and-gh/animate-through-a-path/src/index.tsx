@@ -1,20 +1,12 @@
 import { StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { Canvas, Path, Skia } from '@shopify/react-native-skia';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { useSharedValue } from 'react-native-reanimated';
+import { Canvas, Path } from '@shopify/react-native-skia';
+import { GestureDetector } from 'react-native-gesture-handler';
+
+import { useDrawGesture } from './hooks/useDrawGesture';
 
 const App = () => {
-  const skPath = useSharedValue(Skia.Path.Make());
-
-  const pan = Gesture.Pan()
-    .onBegin(({ x, y }) => {
-      skPath.value.moveTo(x, y);
-    })
-    .onUpdate(({ x, y }) => {
-      skPath.value.lineTo(x, y);
-      skPath.value = Skia.Path.MakeFromSVGString(skPath.value.toSVGString()!)!;
-    });
+  const { pan, pathOpacity, skPath } = useDrawGesture();
 
   return (
     <View style={styles.container}>
@@ -26,6 +18,7 @@ const App = () => {
             color={'white'}
             style={'stroke'}
             strokeWidth={2}
+            opacity={pathOpacity}
           />
         </Canvas>
       </GestureDetector>
