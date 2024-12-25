@@ -1,15 +1,15 @@
-import { Gesture } from 'react-native-gesture-handler';
-import {
-  useSharedValue,
-  useDerivedValue,
-  withTiming,
-  runOnJS,
-} from 'react-native-reanimated';
 import type { SkPath } from '@shopify/react-native-skia';
 import { Skia } from '@shopify/react-native-skia';
+import { Gesture } from 'react-native-gesture-handler';
+import {
+  runOnJS,
+  useDerivedValue,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
 type UseDrawGestureParams = {
-  onComplete: (completePath: SkPath) => void;
+  onComplete: (completedPath: SkPath) => void;
 };
 
 export const useDrawGesture = ({ onComplete }: UseDrawGestureParams) => {
