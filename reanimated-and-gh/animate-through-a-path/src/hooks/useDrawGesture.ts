@@ -3,10 +3,16 @@ import {
   useSharedValue,
   useDerivedValue,
   withTiming,
+  runOnJS,
 } from 'react-native-reanimated';
+import type { SkPath } from '@shopify/react-native-skia';
 import { Skia } from '@shopify/react-native-skia';
 
-export const useDrawGesture = () => {
+type UseDrawGestureParams = {
+  onComplete: (completePath: SkPath) => void;
+};
+
+export const useDrawGesture = ({ onComplete }: UseDrawGestureParams) => {
   const skPath = useSharedValue(Skia.Path.Make());
   const isDrawing = useSharedValue(false);
 
@@ -22,6 +28,7 @@ export const useDrawGesture = () => {
     })
     .onFinalize(() => {
       isDrawing.value = false;
+      runOnJS(onComplete)(skPath.value);
     });
 
   const pathOpacity = useDerivedValue(() => {
