@@ -1,31 +1,16 @@
 import { StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
-import { Circle, Group, Path, Skia } from '@shopify/react-native-skia';
+import { runOnJS, useDerivedValue } from 'react-native-reanimated';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import Touchable from 'react-native-skia-gesture';
+import { Circle, Group, Path, Skia } from '@shopify/react-native-skia';
 
-import { InitialPoints } from './constants';
+import { InitialPoints } from '../../src/constants';
+import { useSharedControlPoint } from '../../src/hooks/useSharedControlPoint';
+import { useAnimateThroughPath } from '../../src/hooks/useAnimateThroughPath';
+import { SharedBezierPathSvgString } from '../../src/global-animation-state';
 
-type Point = {
-  x: number;
-  y: number;
-};
-
-const useSharedControlPoint = (initialPoint: Point) => {
-  const controlPoint = useSharedValue(initialPoint);
-  const cx = useDerivedValue(() => {
-    return controlPoint.value.x;
-  });
-
-  const cy = useDerivedValue(() => {
-    return controlPoint.value.y;
-  });
-
-  return { controlPoint, cx, cy };
-};
-
-const App = () => {
+export default function Bezier() {
   const first = useSharedControlPoint(InitialPoints.first);
   const second = useSharedControlPoint(InitialPoints.second);
   const third = useSharedControlPoint(InitialPoints.third);
@@ -58,6 +43,12 @@ const App = () => {
 
     return skPath;
   }, []);
+
+  const {
+    startAnimation,
+    cx: animationX,
+    cy: animationY,
+  } = useAnimateThroughPath();
 
   return (
     <View style={styles.container}>
@@ -96,6 +87,13 @@ const App = () => {
                 cy={cy}
                 onStart={onUpdate}
                 onActive={onUpdate}
+                onEnd={() => {
+                  'worklet';
+
+                  SharedBezierPathSvgString.value =
+                    bezierPath.value.toSVGString();
+                  runOnJS(startAnimation)(bezierPath.value);
+                }}
                 r={12}
                 color={color}
                 strokeWidth={2}
@@ -112,15 +110,14 @@ const App = () => {
             </Group>
           );
         })}
+        <Circle cx={animationX} cy={animationY} r={12} color={'red'} />
       </Touchable.Canvas>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
 });
-
-export { App };
