@@ -5,6 +5,7 @@ import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import Touchable from 'react-native-skia-gesture';
 
 import { InitialPoints } from './constants';
+import { Path, Skia } from '@shopify/react-native-skia';
 
 type Point = {
   x: number;
@@ -31,6 +32,21 @@ const App = () => {
   const fourth = useSharedControlPoint(InitialPoints.fourth);
   const controlPoints = [first, second, third, fourth];
 
+  const bezierPath = useDerivedValue(() => {
+    const skPath = Skia.Path.Make();
+
+    skPath.moveTo(first.cx.value, first.cy.value);
+    skPath.cubicTo(
+      second.controlPoint.value.x,
+      second.controlPoint.value.y,
+      third.controlPoint.value.x,
+      third.controlPoint.value.y,
+      fourth.cx.value,
+      fourth.cy.value,
+    );
+    return skPath;
+  }, []);
+
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
@@ -39,6 +55,12 @@ const App = () => {
           flex: 1,
           backgroundColor: 'black',
         }}>
+        <Path
+          path={bezierPath}
+          color={'white'}
+          style={'stroke'}
+          strokeWidth={2}
+        />
         {controlPoints.map(({ cx, cy, controlPoint }, index) => {
           const onUpdate = (event: { x: number; y: number }) => {
             'worklet';
