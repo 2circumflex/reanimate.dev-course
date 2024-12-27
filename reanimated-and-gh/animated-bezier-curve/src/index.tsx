@@ -1,11 +1,11 @@
 import { StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
+import { Circle, Group, Path, Skia } from '@shopify/react-native-skia';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import Touchable from 'react-native-skia-gesture';
 
 import { InitialPoints } from './constants';
-import { Path, Skia } from '@shopify/react-native-skia';
 
 type Point = {
   x: number;
@@ -37,15 +37,27 @@ const App = () => {
 
     skPath.moveTo(first.cx.value, first.cy.value);
     skPath.cubicTo(
-      second.controlPoint.value.x,
-      second.controlPoint.value.y,
-      third.controlPoint.value.x,
-      third.controlPoint.value.y,
+      second.cx.value,
+      second.cy.value,
+      third.cx.value,
+      third.cy.value,
       fourth.cx.value,
       fourth.cy.value,
     );
     return skPath;
   }, []);
+
+  const bezierPathVisualization = useDerivedValue(() => {
+    const skPath = Skia.Path.Make();
+
+    skPath.moveTo(first.cx.value, first.cy.value);
+    skPath.lineTo(second.cx.value, second.cy.value);
+
+    skPath.moveTo(third.cx.value, third.cy.value);
+    skPath.lineTo(fourth.cx.value, fourth.cy.value);
+
+    return skPath;
+  });
 
   return (
     <View style={styles.container}>
@@ -61,24 +73,43 @@ const App = () => {
           style={'stroke'}
           strokeWidth={2}
         />
+        <Path
+          path={bezierPathVisualization}
+          color={'rgba(255, 255, 255, 0.4)'}
+          style={'stroke'}
+          strokeWidth={2}
+        />
         {controlPoints.map(({ cx, cy, controlPoint }, index) => {
           const onUpdate = (event: { x: number; y: number }) => {
             'worklet';
             controlPoint.value = { x: event.x, y: event.y };
           };
 
+          const isStartOrEnd = index === 0 || index === 3;
+
+          const color = isStartOrEnd ? 'white' : 'rgba(255, 255, 255, 0.4)';
+
           return (
-            <Touchable.Circle
-              key={index}
-              cx={cx}
-              cy={cy}
-              onStart={onUpdate}
-              onActive={onUpdate}
-              r={12}
-              color={'white'}
-              strokeWidth={2}
-              style={'stroke'}
-            />
+            <Group key={index}>
+              <Touchable.Circle
+                cx={cx}
+                cy={cy}
+                onStart={onUpdate}
+                onActive={onUpdate}
+                r={12}
+                color={color}
+                strokeWidth={2}
+                style={'stroke'}
+              />
+              <Circle
+                cx={cx}
+                cy={cy}
+                r={12}
+                color={'black'}
+                strokeWidth={2}
+                style={'fill'}
+              />
+            </Group>
           );
         })}
       </Touchable.Canvas>
