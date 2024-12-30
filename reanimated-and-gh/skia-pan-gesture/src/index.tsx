@@ -1,5 +1,5 @@
 import { Dimensions, StyleSheet } from 'react-native';
-import { Group, rect, Rect } from '@shopify/react-native-skia';
+import { BlurMask, Group, rect, Rect } from '@shopify/react-native-skia';
 import Touchable, { useGestureHandler } from 'react-native-skia-gesture';
 import {
   useDerivedValue,
@@ -64,35 +64,42 @@ const App = () => {
   const whiteRect = rect(0, 0, ScreenWidth, ScreenHeight / 2);
   const blackRect = rect(0, ScreenHeight / 2, ScreenWidth, ScreenHeight / 2);
 
+  const blur = useDerivedValue(() => {
+    return withTiming(isDragging.value ? 20 : 0);
+  }, []);
+
   return (
     <Touchable.Canvas style={styles.container}>
       <Rect rect={whiteRect} color={'white'} />
       <Rect rect={blackRect} color={'black'} />
-      <Group clip={whiteRect}>
-        <Group transform={transform} origin={origin}>
-          <Touchable.RoundedRect
-            x={translateX}
-            y={translateY}
-            width={SquareSize}
-            height={SquareSize}
-            r={30}
-            color={'black'}
-            {...panGesture}
-          />
+      <Group>
+        <Group clip={whiteRect}>
+          <Group transform={transform} origin={origin}>
+            <Touchable.RoundedRect
+              x={translateX}
+              y={translateY}
+              width={SquareSize}
+              height={SquareSize}
+              r={30}
+              color={'black'}
+              {...panGesture}
+            />
+          </Group>
         </Group>
-      </Group>
-      <Group clip={whiteRect} invertClip>
-        <Group transform={transform} origin={origin}>
-          <Touchable.RoundedRect
-            x={translateX}
-            y={translateY}
-            width={SquareSize}
-            height={SquareSize}
-            r={30}
-            color={'white'}
-            {...panGesture}
-          />
+        <Group clip={whiteRect} invertClip>
+          <Group transform={transform} origin={origin}>
+            <Touchable.RoundedRect
+              x={translateX}
+              y={translateY}
+              width={SquareSize}
+              height={SquareSize}
+              r={30}
+              color={'white'}
+              {...panGesture}
+            />
+          </Group>
         </Group>
+        <BlurMask blur={blur} style={'solid'} />
       </Group>
     </Touchable.Canvas>
   );
