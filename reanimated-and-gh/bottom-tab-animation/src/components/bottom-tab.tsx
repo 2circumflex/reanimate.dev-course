@@ -6,11 +6,18 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { usePathname, useRouter } from 'expo-router';
+import Animated, {
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 
 import { ScreenNames } from '../constants';
 import { getIconByScreenName } from '../helpers/get-icon-by-screen-name';
 
 import { AnimatedOpacity } from './animated-opacity';
+import { HighlightedPath } from './highlighted-path';
+
+const BottomTabBarHeight = 65;
 
 export const BottomTab = () => {
   const { bottom: safeBottom } = useSafeAreaInsets();
@@ -20,7 +27,21 @@ export const BottomTab = () => {
   const { width: windowWidth } = useWindowDimensions();
   const tabBarWidth = windowWidth * 0.85;
   const internalHorizontalPadding = windowWidth * 0.05;
-  const tabBarItemWidth = tabBarWidth / Object.values(ScreenNames).length;
+  const tabBarItemWidth =
+    (tabBarWidth - internalHorizontalPadding * 2) /
+    Object.values(ScreenNames).length;
+
+  const rHighlightedViewStyle = useAnimatedStyle(() => {
+    const offset =
+      tabBarItemWidth *
+      Object.values(ScreenNames)
+        .map(item => '/' + item)
+        .indexOf(pathname);
+
+    return {
+      left: withTiming(internalHorizontalPadding + offset),
+    };
+  }, [pathname, internalHorizontalPadding]);
 
   return (
     <View
@@ -32,6 +53,17 @@ export const BottomTab = () => {
         },
         styles.container,
       ]}>
+      <Animated.View
+        style={[
+          {
+            left: internalHorizontalPadding,
+            width: tabBarItemWidth,
+          },
+          rHighlightedViewStyle,
+          styles.highlightedView,
+        ]}>
+        <HighlightedPath width={tabBarItemWidth} height={BottomTabBarHeight} />
+      </Animated.View>
       {Object.values(ScreenNames).map(screenName => {
         return (
           <TouchableOpacity
@@ -55,7 +87,7 @@ export const BottomTab = () => {
 
 const styles = StyleSheet.create({
   container: {
-    height: 65,
+    height: BottomTabBarHeight,
     borderRadius: 30,
     borderCurve: 'continuous',
     alignSelf: 'center',
@@ -66,5 +98,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  highlightedView: {
+    position: 'absolute',
+    height: BottomTabBarHeight,
   },
 });
