@@ -5,14 +5,17 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { usePathname, useRouter } from 'expo-router';
 
 import { ScreenNames } from '../constants';
 import { getIconByScreenName } from '../helpers/get-icon-by-screen-name';
 
+import { AnimatedOpacity } from './animated-opacity';
+
 export const BottomTab = () => {
   const { bottom: safeBottom } = useSafeAreaInsets();
   const router = useRouter();
+  const pathname = usePathname();
 
   const { width: windowWidth } = useWindowDimensions();
   const tabBarWidth = windowWidth * 0.85;
@@ -38,7 +41,11 @@ export const BottomTab = () => {
               //
               router.navigate(screenName);
             }}>
-            {getIconByScreenName(screenName)}
+            <AnimatedOpacity
+              isVisible={pathname.includes(screenName)}
+              minOpacity={0.5}>
+              {getIconByScreenName(screenName)}
+            </AnimatedOpacity>
           </TouchableOpacity>
         );
       })}
