@@ -10,6 +10,7 @@ import {
   useImage,
 } from '@shopify/react-native-skia';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
+import { glsl } from './helpers/shader-lib';
 
 const FIRST_IMAGE =
   'https://images.unsplash.com/photo-1596501048547-e9acb71ca798?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
@@ -17,7 +18,7 @@ const FIRST_IMAGE =
 const SECOND_IMAGE =
   'https://images.unsplash.com/photo-1531168556467-80aace0d0144?q=80&w=3174&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 
-const shader = `
+const shader = glsl`
 uniform shader image1;
 uniform shader image2;
 
