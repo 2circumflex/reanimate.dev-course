@@ -9,6 +9,7 @@ import {
   Skia,
   useImage,
 } from '@shopify/react-native-skia';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 
 const FIRST_IMAGE =
   'https://images.unsplash.com/photo-1596501048547-e9acb71ca798?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
@@ -52,13 +53,22 @@ const App = () => {
   const firstImage = useImage(FIRST_IMAGE);
   const secondImage = useImage(SECOND_IMAGE);
 
+  const progress = useSharedValue(0);
+
+  const uniforms = useDerivedValue(() => {
+    return {
+      progress: progress.value,
+      resolution: [canvasWidth, canvasHeight],
+    };
+  }, [canvasWidth, canvasHeight]);
+
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
       <Slider
         style={styles.slider}
         minimumTrackTintColor="#fff"
-        // onValueChange={value => console.log(value)}
+        onValueChange={value => (progress.value = value)}
       />
       <Canvas
         style={[
@@ -69,12 +79,7 @@ const App = () => {
           styles.canvas,
         ]}>
         <Fill>
-          <Shader
-            source={shaderRuntimeEffect!}
-            uniforms={{
-              progress: 0.5,
-              resolution: [canvasWidth, canvasHeight],
-            }}>
+          <Shader source={shaderRuntimeEffect!} uniforms={uniforms}>
             <ImageShader
               image={firstImage}
               width={canvasHeight}
