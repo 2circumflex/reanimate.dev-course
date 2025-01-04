@@ -5,6 +5,8 @@ import {
   Canvas,
   Fill,
   ImageShader,
+  Shader,
+  Skia,
   useImage,
 } from '@shopify/react-native-skia';
 
@@ -13,6 +15,34 @@ const FIRST_IMAGE =
 
 const SECOND_IMAGE =
   'https://images.unsplash.com/photo-1531168556467-80aace0d0144?q=80&w=3174&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+
+const shader = `
+uniform shader image1;
+uniform shader image2;
+
+uniform float progress;
+uniform float2 resolution;
+
+// uv(0,0) - (1,1)
+// fragCoord (0,0) - (width, height)
+half4 getFromColor(float2 uv, float2 resolution) {
+  return image1.eval(uv * resolution);
+}
+
+half4 getToColor(float2 uv, float2 resolution) {
+  return image2.eval(uv * resolution);
+}
+
+half4 main(float2 xy) {
+  return mix(
+    getFromColor(xy / resolution, resolution),
+    getToColor(xy / resolution, resolution),
+    progress
+  );
+}
+`;
+
+const shaderRuntimeEffect = Skia.RuntimeEffect.Make(shader);
 
 const App = () => {
   const { width: windowWidth } = useWindowDimensions();
@@ -39,18 +69,25 @@ const App = () => {
           styles.canvas,
         ]}>
         <Fill>
-          <ImageShader
-            image={firstImage}
-            width={canvasHeight}
-            height={canvasHeight}
-            fit={'cover'}
-          />
-          <ImageShader
-            image={secondImage}
-            width={canvasHeight}
-            height={canvasHeight}
-            fit={'cover'}
-          />
+          <Shader
+            source={shaderRuntimeEffect!}
+            uniforms={{
+              progress: 0.5,
+              resolution: [canvasWidth, canvasHeight],
+            }}>
+            <ImageShader
+              image={firstImage}
+              width={canvasHeight}
+              height={canvasHeight}
+              fit={'cover'}
+            />
+            <ImageShader
+              image={secondImage}
+              width={canvasHeight}
+              height={canvasHeight}
+              fit={'cover'}
+            />
+          </Shader>
         </Fill>
       </Canvas>
     </View>
