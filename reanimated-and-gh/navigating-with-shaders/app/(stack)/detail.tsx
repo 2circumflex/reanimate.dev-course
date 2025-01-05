@@ -8,6 +8,7 @@ import { useNavigation } from 'expo-router';
 import { useNotes } from '../../src/atoms';
 import { Palette } from '../../src/constants';
 import { PressableScale } from '../../src/components/pressable-scale';
+import { useTransitions } from '../../src/provider/transitions-provider';
 
 export default function DetailScreen() {
   const { goBack } = useNavigation();
@@ -19,9 +20,12 @@ export default function DetailScreen() {
     noteText.current = text;
   }, []);
 
+  const { runTransition } = useTransitions();
+
   const onClose = useCallback(async () => {
     goBack();
-  }, [goBack]);
+    runTransition();
+  }, [goBack, runTransition]);
 
   const onSave = useCallback(async () => {
     if (!noteText.current) {

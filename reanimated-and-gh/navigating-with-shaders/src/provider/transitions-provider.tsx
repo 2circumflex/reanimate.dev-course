@@ -10,7 +10,12 @@ import { useWindowDimensions, View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 
 const TransitionsContext = createContext({
-  prepareTransition: () => {},
+  prepareTransition: (): Promise<void> => {
+    return Promise.resolve();
+  },
+  runTransition: (): Promise<void> => {
+    return Promise.resolve();
+  },
 });
 
 export const useTransitions = () => {
@@ -26,6 +31,7 @@ export const TransitionsProvider: React.FC<TransitionsProviderProps> = ({
 }) => {
   const viewRef = useRef<View>(null);
   const firstImage = useSharedValue<SkImage | null>(null);
+  const secondImage = useSharedValue<SkImage | null>(null);
 
   const prepareTransition = useCallback(async () => {
     const imageSnapshot = await makeImageFromView(viewRef);
@@ -33,12 +39,19 @@ export const TransitionsProvider: React.FC<TransitionsProviderProps> = ({
     console.log('prepareTransition');
   }, [firstImage]);
 
+  const runTransition = useCallback(async () => {
+    const imageSnapshot = await makeImageFromView(viewRef);
+    secondImage.value = imageSnapshot;
+    console.log('runTransition');
+  }, [secondImage]);
+
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
 
   return (
     <TransitionsContext.Provider
       value={{
         prepareTransition,
+        runTransition,
       }}>
       <Canvas
         style={{
@@ -49,12 +62,18 @@ export const TransitionsProvider: React.FC<TransitionsProviderProps> = ({
           bottom: 0,
           zIndex: 1000,
           backgroundColor: 'red',
-          opacity: 0.5,
+          opacity: 1,
           pointerEvents: 'none',
         }}>
         <Fill>
           <ImageShader
             image={firstImage}
+            width={windowWidth}
+            height={windowHeight}
+            fit="cover"
+          />
+          <ImageShader
+            image={secondImage}
             width={windowWidth}
             height={windowHeight}
             fit="cover"
