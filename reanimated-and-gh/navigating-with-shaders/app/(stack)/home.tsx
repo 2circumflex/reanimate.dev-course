@@ -9,6 +9,7 @@ import { useRouter } from 'expo-router';
 import { Palette } from '../../src/constants';
 import { PressableScale } from '../../src/components/pressable-scale';
 import { useNotes } from '../../src/atoms';
+import { useTransitions } from '../../src/provider/transitions-provider';
 
 export default function HomeScreen() {
   const navigation = useRouter();
@@ -17,6 +18,8 @@ export default function HomeScreen() {
   const { top: safeTop, bottom: safeBottom } = useSafeAreaInsets();
 
   const gap = 35 / 3;
+
+  const { prepareTransition } = useTransitions();
 
   const ListHeaderComponent = useMemo(() => {
     return (
@@ -34,6 +37,7 @@ export default function HomeScreen() {
         </View>
         <PressableScale
           onPress={() => {
+            prepareTransition();
             navigation.navigate('detail');
           }}
           style={[
@@ -46,7 +50,7 @@ export default function HomeScreen() {
         </PressableScale>
       </View>
     );
-  }, [navigation]);
+  }, [navigation, prepareTransition]);
 
   return (
     <View style={{ flex: 1, backgroundColor: Palette.background }}>
