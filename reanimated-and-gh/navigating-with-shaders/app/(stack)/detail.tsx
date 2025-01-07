@@ -23,8 +23,10 @@ export default function DetailScreen() {
   const { runTransition } = useTransitions();
 
   const onClose = useCallback(async () => {
-    goBack();
     runTransition();
+    setTimeout(() => {
+      goBack();
+    }, 1000);
   }, [goBack, runTransition]);
 
   const onSave = useCallback(async () => {

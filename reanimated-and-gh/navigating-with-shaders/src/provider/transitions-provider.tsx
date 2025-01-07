@@ -101,6 +101,7 @@ export const TransitionsProvider: React.FC<TransitionsProviderProps> = ({
   const rCanvasStyle = useAnimatedStyle(() => {
     return {
       opacity: progress.value > 0 ? 1 : 0,
+      pointerEvents: progress.value > 0 ? 'auto' : 'none',
     };
   }, []);
 
@@ -119,8 +120,6 @@ export const TransitionsProvider: React.FC<TransitionsProviderProps> = ({
             right: 0,
             bottom: 0,
             zIndex: 1000,
-            backgroundColor: 'red',
-            pointerEvents: 'none',
           },
           rCanvasStyle,
         ]}>
