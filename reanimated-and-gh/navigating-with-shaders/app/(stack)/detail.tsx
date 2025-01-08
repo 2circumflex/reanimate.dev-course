@@ -34,19 +34,19 @@ export default function DetailScreen() {
       Alert.alert('Empty Note', 'Please write something before saving');
       return;
     }
-
-    setNotes(prev => {
-      return [
-        {
-          id: (prev.length + 1).toString(),
-          title: noteText.current,
-        },
-        ...prev,
-      ];
+    runTransition(() => {
+      setNotes(prev => {
+        return [
+          {
+            id: (prev.length + 1).toString(),
+            title: noteText.current,
+          },
+          ...prev,
+        ];
+      });
     });
-
     goBack();
-  }, [goBack, setNotes]);
+  }, [goBack, runTransition, setNotes]);
 
   const { top: safeTop } = useSafeAreaInsets();
 

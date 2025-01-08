@@ -9,6 +9,7 @@ import {
 import { createContext, useCallback, useContext, useRef } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import Animated, {
+  runOnJS,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
@@ -22,7 +23,7 @@ const TransitionsContext = createContext({
   prepareTransition: (): Promise<void> => {
     return Promise.resolve();
   },
-  runTransition: (): Promise<void> => {
+  runTransition: (_?: () => void): Promise<void> => {
     return Promise.resolve();
   },
 });
@@ -71,23 +72,29 @@ export const TransitionsProvider: React.FC<TransitionsProviderProps> = ({
     firstImage.value = imageSnapshot;
   }, [firstImage]);
 
-  const runTransition = useCallback(async () => {
-    const imageSnapshot = await makeImageFromView(viewRef);
-    secondImage.value = imageSnapshot;
-    progress.value = withTiming(
-      1,
-      {
-        duration: 2000,
-      },
-      isFinished => {
-        if (isFinished) {
-          progress.value = 0;
-          firstImage.value = null;
-          secondImage.value = null;
-        }
-      },
-    );
-  }, [firstImage, secondImage, progress]);
+  const runTransition = useCallback(
+    async (exitingCallback?: () => void) => {
+      const imageSnapshot = await makeImageFromView(viewRef);
+      secondImage.value = imageSnapshot;
+      progress.value = withTiming(
+        1,
+        {
+          duration: 2000,
+        },
+        isFinished => {
+          if (isFinished) {
+            progress.value = 0;
+            firstImage.value = null;
+            secondImage.value = null;
+            if (exitingCallback) {
+              runOnJS(exitingCallback)();
+            }
+          }
+        },
+      );
+    },
+    [firstImage, secondImage, progress],
+  );
 
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
 

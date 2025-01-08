@@ -5,11 +5,16 @@ import { StatusBar } from 'expo-status-bar';
 import { useMemo } from 'react';
 import MasonryList from '@react-native-seoul/masonry-list';
 import { useRouter } from 'expo-router';
+import Animated, {
+  FadeInDown,
+  FadeOutDown,
+  LinearTransition,
+} from 'react-native-reanimated';
 
+import { useTransitions } from '../../src/provider/transitions-provider';
 import { Palette } from '../../src/constants';
 import { PressableScale } from '../../src/components/pressable-scale';
 import { useNotes } from '../../src/atoms';
-import { useTransitions } from '../../src/provider/transitions-provider';
 
 export default function HomeScreen() {
   const navigation = useRouter();
@@ -72,7 +77,10 @@ export default function HomeScreen() {
         // @ts-ignore
         renderItem={({ item, i: index }: { item: NoteType; i: number }) => {
           return (
-            <View
+            <Animated.View
+              layout={LinearTransition}
+              entering={FadeInDown.delay(index * 100)}
+              exiting={FadeOutDown}
               style={[
                 {
                   marginLeft: gap,
@@ -91,7 +99,7 @@ export default function HomeScreen() {
                 ]}>
                 {item.title}
               </Text>
-            </View>
+            </Animated.View>
           );
         }}
       />
